@@ -2,9 +2,11 @@ const myID = document.getElementById("userlg");
 const myPw = document.getElementById("password");
 const submitbtn = document.getElementById("submit");
 
+const profileDis = document.getElementById("Profile");
+const CreatePro = document.createElement("div");
+
 const getLogin = async (username, password) => {
   const loginOb = { username, password };
-  console.log(loginOb);
   try {
     const response = await fetch(
       "https://api.learnhub.thanayut.in.th/auth/login",
@@ -20,25 +22,37 @@ const getLogin = async (username, password) => {
       return;
     }
     console.log(data.accessToken);
+    localStorage.setItem("token", data.accessToken);
+    getProfile();
     return data.accessToken;
   } catch (err) {
     console.log(err);
   }
 };
 
-// const getProfile = async () => {
+const getProfile = async () => {
+  const assetTokenID = localStorage.getItem("token");
+  try {
+    const getRes = await fetch("https://api.learnhub.thanayut.in.th/auth/me", {
+      method: "GET",
+      headers: {
+        accept: "application/json; charset=UTF-8",
+        Authorization: `Bearer ${assetTokenID}`,
+      },
+    });
+    const data = await getRes.json();
+    console.log(data);
 
-//   try {
-//     const getRes = fetch("https://api.learnhub.thanayut.in.th/auth/me" ,
-//     {
-//       method: "GET",
+    CreatePro.innerHTML = `<p>User id : <span>${data.id}</span></p>
+    <p>username : <span>${data.username}</span></p>
+    <p>name : <span>${data.name}</span></p>`;
+    return profileDis.appendChild(CreatePro);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-//     })
-//   } catch (err) {
-//     console.log(err)
-//   }
-// }
-
+//click button
 submitbtn.addEventListener("click", (e) => {
   e.preventDefault();
   //check user and password if doen't have any text.
@@ -46,15 +60,10 @@ submitbtn.addEventListener("click", (e) => {
     alert("!!!");
     return;
   }
-  localStorage.setItem("tokenID", myID.value);
-  localStorage.setItem("tokenPw", myPw.value);
+  // localStorage.setItem("token", [myID.value, myPw.value]);
   getLogin(myID.value, myPw.value);
-  //set value to function to getLogin from userID and passwordID
-  // const asset = await getLogin(myID.value, myPw.value);
-
   // if (!asset) return;
   // localStorage.setItem("tokenID", myID.value);
   //Inpto function this.
-  // getperSonId();
 });
 //put button login
