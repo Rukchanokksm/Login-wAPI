@@ -1,19 +1,29 @@
-const myID = document.getElementById("userlg");
+const myID = document.getElementById("username");
 const myPw = document.getElementById("password");
 const submitbtn = document.getElementById("submit");
-
 const profileDis = document.getElementById("Profile");
 const CreatePro = document.createElement("div");
 
-const getLogin = async (username, password) => {
-  const loginOb = { username, password };
+//click button
+submitbtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  //check user and password if doen't have any text.
+  if (!myID.value || !myPw.value) {
+    alert("Please fill username and password !!!");
+    return;
+  }
+  Login(myID.value, myPw.value);
+});
+
+const Login = async (username, password) => {
+  const loginObject = { username, password };
   try {
     const response = await fetch(
       "https://api.learnhub.thanayut.in.th/auth/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
-        body: JSON.stringify(loginOb),
+        body: JSON.stringify(loginObject),
       }
     );
     const data = await response.json();
@@ -21,10 +31,9 @@ const getLogin = async (username, password) => {
       alert(data.message);
       return;
     }
-    console.log(data.accessToken);
     localStorage.setItem("token", data.accessToken);
     getProfile();
-    return data.accessToken;
+    return;
   } catch (err) {
     console.log(err);
   }
@@ -41,29 +50,14 @@ const getProfile = async () => {
       },
     });
     const data = await getRes.json();
-    console.log(data);
+    // console.log(data);
 
     CreatePro.innerHTML = `<p>User id : <span>${data.id}</span></p>
     <p>username : <span>${data.username}</span></p>
-    <p>name : <span>${data.name}</span></p>`;
+    <p>name : <span>${data.name}</span></p>`
     return profileDis.appendChild(CreatePro);
   } catch (err) {
     console.log(err);
   }
 };
 
-//click button
-submitbtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  //check user and password if doen't have any text.
-  if (!myID.value || !myPw.value) {
-    alert("!!!");
-    return;
-  }
-  // localStorage.setItem("token", [myID.value, myPw.value]);
-  getLogin(myID.value, myPw.value);
-  // if (!asset) return;
-  // localStorage.setItem("tokenID", myID.value);
-  //Inpto function this.
-});
-//put button login
